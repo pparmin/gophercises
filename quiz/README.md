@@ -10,6 +10,6 @@ This exercise is really great to learn more about the following packages:
 - [strings](https://pkg.go.dev/strings)
 
 ## Pictures for visualization: 
-Help: ![help flag](https://ibb.co/swgvrMT)
+Help: ![help flag](https://i.ibb.co/1q0fxwC/helpFlag.png)
 
-Playing the game: ![playing the game](https://ibb.co/sbZKFVS)
+Playing the game: ![playing the game](https://i.ibb.co/YPxctL9/play.png)
