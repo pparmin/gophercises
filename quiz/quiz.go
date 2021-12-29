@@ -28,7 +28,6 @@ func play(quiz *csv.Reader, limit int, total int) {
 			if math.Floor(time.Since(start).Seconds()) == float64(limit) {
 				exit(correct, total)
 			}
-			time.Sleep(2 * time.Second)
 		}
 	}()
 
