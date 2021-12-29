@@ -20,13 +20,13 @@ func exit(correct, total int) {
 }
 
 func play(quiz *csv.Reader, limit int, total int) {
-	counter := 0
+	correct := 0
 	i := 1
 	start := time.Now()
 	go func() {
 		for {
 			if math.Floor(time.Since(start).Seconds()) == float64(limit) {
-				exit(counter, total)
+				exit(correct, total)
 			}
 			time.Sleep(2 * time.Second)
 		}
@@ -38,7 +38,7 @@ func play(quiz *csv.Reader, limit int, total int) {
 			if err != nil {
 				log.Fatal(err)
 			}
-			exit(counter, total)
+			exit(correct, total)
 		}
 
 		if err != nil {
@@ -63,7 +63,7 @@ func play(quiz *csv.Reader, limit int, total int) {
 
 		if input == solution {
 			fmt.Println("Correct!")
-			counter++
+			correct++
 		}
 
 		i++
