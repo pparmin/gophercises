@@ -11,6 +11,7 @@ import (
 	"os"
 	"strings"
 	"time"
+	"unicode"
 )
 
 func exit(correct, total int) {
@@ -52,8 +53,13 @@ func play(quiz *csv.Reader, limit int, total int) {
 		if err != nil {
 			log.Fatal(err)
 		}
-
-		input = strings.TrimRight(input, "\n")
+		// filter all non-number input (including extra space)
+		input = strings.TrimLeftFunc(input, func(r rune) bool {
+			return !unicode.IsNumber(r)
+		})
+		input = strings.TrimRightFunc(input, func(r rune) bool {
+			return !unicode.IsNumber(r)
+		})
 
 		if input == solution {
 			fmt.Println("Correct!")
