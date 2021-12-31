@@ -69,7 +69,6 @@ func exit(correct, total int) {
 
 func play(problems []problem, limit int) {
 	correct := 0
-	// i := 1
 	start := time.Now()
 	go func() {
 		for {
