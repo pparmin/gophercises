@@ -5,7 +5,6 @@ import (
 	"encoding/csv"
 	"flag"
 	"fmt"
-	"io"
 	"log"
 	"math"
 	"os"
@@ -14,58 +13,82 @@ import (
 	"unicode"
 )
 
+type problem struct {
+	question string
+	answer   string
+}
+
+func parse(lines [][]string) []problem {
+	problems := make([]problem, len(lines))
+	for i, line := range lines {
+		problems[i] = problem{
+			question: line[0],
+			answer:   strings.TrimSpace(line[1]),
+		}
+	}
+	return problems
+}
+
+func getInput() string {
+	reader := bufio.NewReader(os.Stdin)
+
+	input, err := reader.ReadString('\n')
+	if err != nil {
+		log.Fatal(err)
+	}
+	// filter all non-number input (including extra space)
+	input = strings.TrimLeftFunc(input, func(r rune) bool {
+		return !unicode.IsNumber(r)
+	})
+	input = strings.TrimRightFunc(input, func(r rune) bool {
+		return !unicode.IsNumber(r)
+	})
+	return input
+}
+
+func readFile(path string) []problem {
+	file, err := os.Open(path)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	quiz := csv.NewReader(file)
+	questions, err := quiz.ReadAll()
+	if err != nil {
+		log.Fatal(err)
+	}
+	problems := parse(questions)
+	return problems
+}
+
 func exit(correct, total int) {
 	fmt.Printf("\nCongratulations! You answered %d out of %d questions correctly!\n", correct, total)
 	os.Exit(0)
 }
 
-func play(quiz *csv.Reader, limit int, total int) {
+func play(problems []problem, limit int) {
 	correct := 0
-	i := 1
+	// i := 1
 	start := time.Now()
 	go func() {
 		for {
 			if math.Floor(time.Since(start).Seconds()) == float64(limit) {
-				exit(correct, total)
+				exit(correct, len(problems))
 			}
 		}
 	}()
 
-	for {
-		record, err := quiz.Read()
-		if err == io.EOF {
-			if err != nil {
-				log.Fatal(err)
-			}
-			exit(correct, total)
-		}
-
-		if err != nil {
-			log.Fatal("PLAY FUNCTION ", err)
-		}
-		question := record[0]
-		solution := record[1]
-		reader := bufio.NewReader(os.Stdin)
-
-		fmt.Printf("Problem #%d: %s = ", i, question)
-		input, err := reader.ReadString('\n')
-		if err != nil {
-			log.Fatal(err)
-		}
-		// filter all non-number input (including extra space)
-		input = strings.TrimLeftFunc(input, func(r rune) bool {
-			return !unicode.IsNumber(r)
-		})
-		input = strings.TrimRightFunc(input, func(r rune) bool {
-			return !unicode.IsNumber(r)
-		})
-
-		if input == solution {
+	for i, p := range problems {
+		fmt.Printf("Problem #%d: %s = ", i+1, p.question)
+		input := getInput()
+		if input == p.answer {
 			fmt.Println("Correct!")
 			correct++
 		}
-
-		i++
+		if i == len(problems)-1 {
+			exit(correct, len(problems))
+		}
 	}
 }
 
@@ -74,25 +97,6 @@ func main() {
 	limit := flag.Int("limit", 30, "the time limit for the quiz in seconds")
 	flag.Parse()
 
-	// second file Reader in order to get total number of questions
-	file, err := os.Open(*csvFile)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer file.Close()
-
-	f, err := os.Open(*csvFile)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	quiz := csv.NewReader(file)
-	q := csv.NewReader(f)
-
-	questions, err := q.ReadAll()
-	if err != nil {
-		log.Fatal(err)
-	}
-	total := len(questions)
-	play(quiz, *limit, total)
+	problems := readFile(*csvFile)
+	play(problems, *limit)
 }
