@@ -1,9 +1,17 @@
 package urlshort
 
 import (
-	"fmt"
 	"net/http"
 )
+
+func redirectHandler(path, newURL string) http.Handler {
+	rh := func(w http.ResponseWriter, r *http.Request) {
+		if path == r.URL.Path {
+			http.Redirect(w, r, newURL, http.StatusTemporaryRedirect)
+		}
+	}
+	return http.HandlerFunc(rh)
+}
 
 // MapHandler will return an http.HandlerFunc (which also
 // implements http.Handler) that will attempt to map any
@@ -12,22 +20,13 @@ import (
 // If the path is not provided in the map, then the fallback
 // http.Handler will be called instead.
 func MapHandler(pathsToUrls map[string]string, fallback http.Handler) http.HandlerFunc {
-	redirect := false
-	handler := func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println("INCOMING REQUEST TO PATH: ", r.URL.Path)
-		for p, u := range pathsToUrls {
-			if p == r.URL.Path {
-				fmt.Println("REDIRECT FROM: ", r.URL.Path, " TO: ", p)
-				http.Redirect(w, r, u, http.StatusTemporaryRedirect)
-				redirect = true
-			}
-		}
+	mux := http.NewServeMux()
+	for p, u := range pathsToUrls {
+		rh := redirectHandler(p, u)
+		mux.Handle(p, rh)
 	}
-	if redirect {
-		return handler
-	}
-	//	TODO: Implement this...
-	return fallback.ServeHTTP
+	mux.Handle("/", fallback)
+	return mux.ServeHTTP
 }
 
 // YAMLHandler will parse the provided YAML and then return
@@ -48,5 +47,5 @@ func MapHandler(pathsToUrls map[string]string, fallback http.Handler) http.Handl
 // a mapping of paths to urls.
 func YAMLHandler(yml []byte, fallback http.Handler) (http.HandlerFunc, error) {
 	// TODO: Implement this...
-	return nil, nil
+	return fallback.ServeHTTP, nil
 }

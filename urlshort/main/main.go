@@ -14,6 +14,7 @@ func main() {
 	pathsToUrls := map[string]string{
 		"/urlshort-godoc": "https://godoc.org/github.com/gophercises/urlshort",
 		"/yaml-godoc":     "https://godoc.org/gopkg.in/yaml.v2",
+		"/google":         "https://google.com",
 	}
 	mapHandler := urlshort.MapHandler(pathsToUrls, mux)
 
