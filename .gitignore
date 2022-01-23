@@ -1,3 +1,5 @@
 # Ignore irectories
 **/build/
 **/pictures/
+**/yaml/
+**/json/
