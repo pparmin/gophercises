@@ -1,17 +1,24 @@
 package urlshort
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	yml "gopkg.in/yaml.v2"
 )
 
+// type Redirect struct {
+// 	Path string `yaml:"path"`
+// 	URL  string `yaml:"url"`
+// }
+
 type Redirect struct {
-	Path string `yaml:"path"`
-	URL  string `yaml:"url"`
+	Path string
+	URL  string
 }
 
 func redirectHandler(path, newURL string) http.Handler {
@@ -88,18 +95,29 @@ func InputHandler(filePath string, fallback http.Handler) (http.HandlerFunc, err
 	}
 	defer file.Close()
 
-	d := yml.NewDecoder(file)
+	fileType := strings.SplitAfter(filePath, ".")
+	fmt.Println("INPUT: ", fileType[1])
 	var parsedYaml []Redirect
-	err = d.Decode(&parsedYaml)
-	if err != nil {
-		log.Fatalf("dec.Decode() failed with '%s'\n", err)
-	}
-	fmt.Println("PARSED YAML: ", parsedYaml)
 
-	// parsedYaml, err := parseYAML(yml)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	switch fileType[1] {
+	case "yaml":
+		d := yml.NewDecoder(file)
+		err = d.Decode(&parsedYaml)
+		if err != nil {
+			log.Fatalf("yaml decoding failed with '%s'\n", err)
+		}
+		fmt.Println("PARSED YAML: ", parsedYaml)
+	case "json":
+		d := json.NewDecoder(file)
+		err = d.Decode(&parsedYaml)
+		if err != nil {
+			log.Fatalf("json decoding failed with '%s'\n", err)
+		}
+		fmt.Println("PARSED JSON: ", parsedYaml)
+
+	default:
+		fmt.Println("No valid file type passed")
+	}
 	pathMap := buildMap(parsedYaml)
 	return MapHandler(pathMap, fallback), nil
 }

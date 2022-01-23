@@ -4,13 +4,12 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
-	"strings"
 
 	urlshort "github.com/pparmin/gophercises/urlshort"
 )
 
 func getHandler(fileType string) http.HandlerFunc {
-	var handler http.HandlerFunc
+	// var handler http.HandlerFunc
 	switch fileType {
 	case "yaml":
 
@@ -20,7 +19,7 @@ func getHandler(fileType string) http.HandlerFunc {
 
 func main() {
 	mux := defaultMux()
-	yamlFile := flag.String("y", "yaml/default.yaml", "Specify a yaml file which holds a number of paths and redirects")
+	yamlFile := flag.String("r", "yaml/default.yaml", "Specify an input file which holds a number of paths and redirects (currently accepted file types: .yaml, .json")
 	//jsonFile := flag.String("j", "json/default.json", "Specify a json file which holds a number of paths and redirects")
 	flag.Parse()
 
@@ -31,23 +30,6 @@ func main() {
 		"/google":         "https://google.com",
 	}
 	mapHandler := urlshort.MapHandler(pathsToUrls, mux)
-
-	// Build the YAMLHandler using the mapHandler as the
-	// fallback
-	// 	yaml := `
-	// - path: /urlshort
-	//   url: https://github.com/gophercises/urlshort
-	// - path: /urlshort-final
-	//   url: https://github.com/gophercises/urlshort/tree/solution
-	// - path: /amazon
-	//   url: https://amazon.de/
-	// `
-	// yamlHandler, err := urlshort.YAMLHandler([]byte(yaml), mapHandler)
-	// if err != nil {
-	// 	panic(err)
-	// }
-	fileType := strings.SplitAfter(*yamlFile, ".")
-	fmt.Println("INPUT: ", fileType[1])
 	yamlHandler, err := urlshort.InputHandler(*yamlFile, mapHandler)
 	if err != nil {
 		panic(err)
