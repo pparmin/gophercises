@@ -26,7 +26,7 @@ func main() {
 - path: /urlshort-final
   url: https://github.com/gophercises/urlshort/tree/solution
 - path: /amazon
-  url: https://amazon.de/
+  url: https://amazon.de/	
 `
 	yamlHandler, err := urlshort.YAMLHandler([]byte(yaml), mapHandler)
 	if err != nil {
