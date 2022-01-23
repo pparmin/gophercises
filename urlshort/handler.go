@@ -1,8 +1,16 @@
 package urlshort
 
 import (
+	"fmt"
 	"net/http"
+
+	yml "gopkg.in/yaml.v2"
 )
+
+type Redirect struct {
+	Path string `yaml:"path"`
+	URL  string `yaml:"url"`
+}
 
 func redirectHandler(path, newURL string) http.Handler {
 	rh := func(w http.ResponseWriter, r *http.Request) {
@@ -11,6 +19,23 @@ func redirectHandler(path, newURL string) http.Handler {
 		}
 	}
 	return http.HandlerFunc(rh)
+}
+
+func parseYAML(yaml []byte) ([]Redirect, error) {
+	var redirects []Redirect
+	err := yml.Unmarshal(yaml, &redirects)
+	if err != nil {
+		return []Redirect{}, err
+	}
+	return redirects, nil
+}
+
+func buildMap(redirects []Redirect) map[string]string {
+	m := make(map[string]string)
+	for _, r := range redirects {
+		m[r.Path] = r.URL
+	}
+	return m
 }
 
 // MapHandler will return an http.HandlerFunc (which also
@@ -46,6 +71,13 @@ func MapHandler(pathsToUrls map[string]string, fallback http.Handler) http.Handl
 // See MapHandler to create a similar http.HandlerFunc via
 // a mapping of paths to urls.
 func YAMLHandler(yml []byte, fallback http.Handler) (http.HandlerFunc, error) {
+	parsedYaml, err := parseYAML(yml)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println("PARSED YAML: ", parsedYaml)
+	pathMap := buildMap(parsedYaml)
+	fmt.Println("NEW MAP FROM PARSED YAML: ", pathMap)
 	// TODO: Implement this...
-	return fallback.ServeHTTP, nil
+	return MapHandler(pathMap, fallback), nil
 }
