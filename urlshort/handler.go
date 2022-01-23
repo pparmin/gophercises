@@ -1,7 +1,6 @@
 package urlshort
 
 import (
-	"fmt"
 	"net/http"
 
 	yml "gopkg.in/yaml.v2"
@@ -75,9 +74,6 @@ func YAMLHandler(yml []byte, fallback http.Handler) (http.HandlerFunc, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("PARSED YAML: ", parsedYaml)
 	pathMap := buildMap(parsedYaml)
-	fmt.Println("NEW MAP FROM PARSED YAML: ", pathMap)
-	// TODO: Implement this...
 	return MapHandler(pathMap, fallback), nil
 }
