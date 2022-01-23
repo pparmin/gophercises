@@ -1,7 +1,10 @@
 package urlshort
 
 import (
+	"fmt"
+	"log"
 	"net/http"
+	"os"
 
 	yml "gopkg.in/yaml.v2"
 )
@@ -74,6 +77,29 @@ func YAMLHandler(yml []byte, fallback http.Handler) (http.HandlerFunc, error) {
 	if err != nil {
 		return nil, err
 	}
+	pathMap := buildMap(parsedYaml)
+	return MapHandler(pathMap, fallback), nil
+}
+
+func InputHandler(filePath string, fallback http.Handler) (http.HandlerFunc, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	d := yml.NewDecoder(file)
+	var parsedYaml []Redirect
+	err = d.Decode(&parsedYaml)
+	if err != nil {
+		log.Fatalf("dec.Decode() failed with '%s'\n", err)
+	}
+	fmt.Println("PARSED YAML: ", parsedYaml)
+
+	// parsedYaml, err := parseYAML(yml)
+	// if err != nil {
+	// 	return nil, err
+	// }
 	pathMap := buildMap(parsedYaml)
 	return MapHandler(pathMap, fallback), nil
 }
