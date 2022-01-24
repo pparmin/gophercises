@@ -79,14 +79,6 @@ func MapHandler(pathsToUrls map[string]string, fallback http.Handler) http.Handl
 //
 // See MapHandler to create a similar http.HandlerFunc via
 // a mapping of paths to urls.
-func YAMLHandler(yml []byte, fallback http.Handler) (http.HandlerFunc, error) {
-	parsedYaml, err := parseYAML(yml)
-	if err != nil {
-		return nil, err
-	}
-	pathMap := buildMap(parsedYaml)
-	return MapHandler(pathMap, fallback), nil
-}
 
 func InputHandler(filePath string, fallback http.Handler) (http.HandlerFunc, error) {
 	file, err := os.Open(filePath)

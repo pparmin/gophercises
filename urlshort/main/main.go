@@ -8,15 +8,6 @@ import (
 	urlshort "github.com/pparmin/gophercises/urlshort"
 )
 
-func getHandler(fileType string) http.HandlerFunc {
-	// var handler http.HandlerFunc
-	switch fileType {
-	case "yaml":
-
-	}
-	return nil
-}
-
 func main() {
 	mux := defaultMux()
 	yamlFile := flag.String("r", "yaml/default.yaml", "Specify an input file which holds a number of paths and redirects (currently accepted file types: .yaml, .json")
