@@ -10,23 +10,17 @@ import (
 
 func main() {
 	mux := defaultMux()
-	yamlFile := flag.String("r", "yaml/default.yaml", "Specify an input file which holds a number of paths and redirects (currently accepted file types: .yaml, .json")
-	//jsonFile := flag.String("j", "json/default.json", "Specify a json file which holds a number of paths and redirects")
+	inputFile := flag.String("r", "yaml/default.yaml", "Specify an input file which holds a number of paths and redirects (currently accepted file types: .yaml, .json")
 	flag.Parse()
 
-	// Build the MapHandler using the mux as the fallback
-	pathsToUrls := map[string]string{
-		"/urlshort-godoc": "https://godoc.org/github.com/gophercises/urlshort",
-		"/yaml-godoc":     "https://godoc.org/gopkg.in/yaml.v2",
-		"/google":         "https://google.com",
-	}
-	mapHandler := urlshort.MapHandler(pathsToUrls, mux)
-	yamlHandler, err := urlshort.InputHandler(*yamlFile, mapHandler)
+	urlshort.BuildDB(*inputFile)
+	dbHandler, err := urlshort.DBHandler(mux)
 	if err != nil {
 		panic(err)
 	}
+
 	fmt.Println("Starting the server on :8080")
-	http.ListenAndServe(":8080", yamlHandler)
+	http.ListenAndServe(":8080", dbHandler)
 }
 
 func defaultMux() *http.ServeMux {
@@ -38,3 +32,22 @@ func defaultMux() *http.ServeMux {
 func hello(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "Hello, world!")
 }
+
+/*
+------------------------------------------------------------------------------------
+--- ORIGINAL SOLUTION COMMENTED OUT FOR LEGACY REASONS; SOLUTION IS USING BOLTDB ---
+------------------------------------------------------------------------------------
+
+	// Build the MapHandler using the mux as the fallback
+	pathsToUrls := map[string]string{
+		"/urlshort-godoc": "https://godoc.org/github.com/gophercises/urlshort",
+		"/yaml-godoc":     "https://godoc.org/gopkg.in/yaml.v2",
+		"/google":         "https://google.com",
+	}
+	mapHandler := urlshort.MapHandler(pathsToUrls, mux)
+	yamlHandler, err := urlshort.InputHandler(*inputFile, mapHandler)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("YAML: ", yamlHandler, "\n")
+*/
