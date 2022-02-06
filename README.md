@@ -6,7 +6,8 @@ He presents the different exercises first with an introduction video where he de
 
 All solutions have been implemented before watching Jon's solution videos. After watching the solution videos specific improvements are made to reflect his recommendations.  
 
-## Currently implemented exercises
-1/20
+## Currently implemented Gophercises
+2/20
 
 - **Exercise 1**: [Quiz Game](https://github.com/gophercises/quiz) 
+- **Exercise 2**: [URL Shortener](https://github.com/gophercises/urlshort)
