@@ -1,4 +1,4 @@
-# Ignore irectories
+# Ignore directories
 **/build/
 **/pictures/
 **/yaml/
