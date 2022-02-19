@@ -4,4 +4,6 @@
 **/yaml/
 **/json/
 
+# Ignore file types
 *db
+*png
