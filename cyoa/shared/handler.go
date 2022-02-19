@@ -6,10 +6,6 @@ import (
 	"strings"
 )
 
-func test(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Hello, test")
-}
-
 func redirectHandler() http.Handler {
 	rh := func(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/intro", http.StatusPermanentRedirect)
@@ -55,12 +51,5 @@ func ArcHandler(arcs map[string]Arc) (http.HandlerFunc, error) {
 	rh := redirectHandler()
 	mux.HandleFunc("/", rh.ServeHTTP)
 	fmt.Println()
-	return mux.ServeHTTP, nil
-}
-
-func TestHandler(fallback http.Handler) (http.HandlerFunc, error) {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/intro", test)
-	mux.HandleFunc("/", fallback.ServeHTTP)
 	return mux.ServeHTTP, nil
 }
