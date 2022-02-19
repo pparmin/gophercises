@@ -47,8 +47,7 @@ func main() {
 		fmt.Println()
 	}
 
-	mux := defaultMux()
-	arcHandler, err := cyoa.ArcHandler(arcs, mux)
+	arcHandler, err := cyoa.ArcHandler(arcs)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -10,6 +10,13 @@ func test(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "Hello, test")
 }
 
+func redirectHandler() http.Handler {
+	rh := func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/intro", http.StatusPermanentRedirect)
+	}
+	return http.HandlerFunc(rh)
+}
+
 func nameHandler(arcs map[string]Arc, path string) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		name := strings.TrimLeft(path, "/")
@@ -20,10 +27,15 @@ func nameHandler(arcs map[string]Arc, path string) http.Handler {
 				fmt.Fprintf(w, "<p>%s</p>", text)
 			}
 			fmt.Fprintf(w, "<hr>")
-			fmt.Fprintf(w, "<h2>How do you want to proceed?</h2>")
+			if path == "/home" {
+				fmt.Fprintf(w, "<h2>Congratulations. You made it home! ")
+				fmt.Fprintf(w, "<a href=/intro>Back to the start</a>")
+			} else {
+				fmt.Fprintf(w, "<h2>How do you want to proceed?</h2>")
+			}
 			for _, option := range arcs[name].Options {
 				pathToNext := "/" + option.NextArc
-				fmt.Fprintf(w, "<li><a href=%s>%s</li>", pathToNext, option.Text)
+				fmt.Fprintf(w, "<li><a href=%s>%s</a></li>", pathToNext, option.Text)
 			}
 		} else {
 			w.Write([]byte("NO MATCHING PATH FOUND"))
@@ -32,7 +44,7 @@ func nameHandler(arcs map[string]Arc, path string) http.Handler {
 	return http.HandlerFunc(fn)
 }
 
-func ArcHandler(arcs map[string]Arc, fallback http.Handler) (http.HandlerFunc, error) {
+func ArcHandler(arcs map[string]Arc) (http.HandlerFunc, error) {
 	mux := http.NewServeMux()
 	for name := range arcs {
 		path := "/" + name
@@ -40,8 +52,8 @@ func ArcHandler(arcs map[string]Arc, fallback http.Handler) (http.HandlerFunc, e
 		nh := nameHandler(arcs, path)
 		mux.Handle(path, nh)
 	}
-	mux.HandleFunc("/test", test)
-	mux.HandleFunc("/", fallback.ServeHTTP)
+	rh := redirectHandler()
+	mux.HandleFunc("/", rh.ServeHTTP)
 	fmt.Println()
 	return mux.ServeHTTP, nil
 }
