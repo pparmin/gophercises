@@ -20,16 +20,6 @@ import (
 	cyoa "github.com/pparmin/gophercises/cyoa/shared"
 )
 
-func defaultMux() *http.ServeMux {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", hello)
-	return mux
-}
-
-func hello(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Hello, world!")
-}
-
 func main() {
 	file, err := os.Open("gopher.json")
 	if err != nil {
