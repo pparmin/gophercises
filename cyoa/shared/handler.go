@@ -14,8 +14,17 @@ func nameHandler(arcs map[string]Arc, path string) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		name := strings.TrimLeft(path, "/")
 		if path == r.URL.Path {
-			w.Write([]byte("Hello, " + name + "\n"))
-
+			w.Header().Set("Content-Type", "text/html; charset=utf-8")
+			fmt.Fprintf(w, "<h1>%s</h1>", arcs[name].Title)
+			for _, text := range arcs[name].Story {
+				fmt.Fprintf(w, "<p>%s</p>", text)
+			}
+			fmt.Fprintf(w, "<hr>")
+			fmt.Fprintf(w, "<h2>How do you want to proceed?</h2>")
+			for _, option := range arcs[name].Options {
+				pathToNext := "/" + option.NextArc
+				fmt.Fprintf(w, "<li><a href=%s>%s</li>", pathToNext, option.Text)
+			}
 		} else {
 			w.Write([]byte("NO MATCHING PATH FOUND"))
 		}
