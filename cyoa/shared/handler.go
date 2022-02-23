@@ -2,6 +2,7 @@ package cyoa
 
 import (
 	"fmt"
+	"html/template"
 	"net/http"
 	"strings"
 )
@@ -17,21 +18,14 @@ func nameHandler(arcs map[string]Arc, path string) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		name := strings.TrimLeft(path, "/")
 		if path == r.URL.Path {
-			w.Header().Set("Content-Type", "text/html; charset=utf-8")
-			fmt.Fprintf(w, "<h1>%s</h1>", arcs[name].Title)
-			for _, text := range arcs[name].Story {
-				fmt.Fprintf(w, "<p>%s</p>", text)
+			t, err := template.ParseFiles("templates/arc.gohtml")
+			if err != nil {
+				panic(err)
 			}
-			fmt.Fprintf(w, "<hr>")
-			if path == "/home" {
-				fmt.Fprintf(w, "<h2>Congratulations. You made it home! ")
-				fmt.Fprintf(w, "<a href=/intro>Back to the start</a>")
-			} else {
-				fmt.Fprintf(w, "<h2>How do you want to proceed?</h2>")
-			}
-			for _, option := range arcs[name].Options {
-				pathToNext := "/" + option.NextArc
-				fmt.Fprintf(w, "<li><a href=%s>%s</a></li>", pathToNext, option.Text)
+
+			err = t.Execute(w, arcs[name])
+			if err != nil {
+				panic(err)
 			}
 		} else {
 			w.Write([]byte("NO MATCHING PATH FOUND"))

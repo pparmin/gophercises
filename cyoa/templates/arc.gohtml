@@ -9,12 +9,16 @@
 <body>
     <h1>{{.Title}}</h1>
     <div class="story">
-        <p>TEXT</p>
+    {{range .Story}}
+        <p>{{.}}</p>
+    {{end}}
     </div>
 <hr>
     <h2>How do you want to proceed?</h2>
     <div class="options">
-        <li>OPTIONS</li>
+        {{range $option := .Options}}
+            <li><a href="/{{$option.NextArc}}">{{$option.Text}}</a></li>
+        {{end}}
     </div>
 </div>
 </body>
