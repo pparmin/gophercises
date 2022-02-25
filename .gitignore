@@ -7,3 +7,6 @@
 # Ignore file types
 *db
 *png
+
+# Ignore specific file
+quiz/improvements.md
