@@ -1,4 +1,4 @@
-# Exercise 1: Quiz game
+# Gophercise 1: Quiz game
 
 This has been an interesting little exercise. The idea of this exercise is a simple little program, which allows the player to load in a problem set of simple math problems via a .csv file. The player can also set a time limit in which they have to provide solutions to the problems. The program will then go through each problem and prompt the player for their answer. 
 
