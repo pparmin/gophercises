@@ -2,7 +2,7 @@
 JSON files: https://tutorialedge.net/golang/parsing-json-with-golang/
 
 In this case we will use map[string]interface, since the data is
-unstructured and we will not necessarily now the names of each arc
+unstructured and we will not necessarily know the names of each arc
 
 Another very interesting post about how to do this properly and then
 get proper types for each field: https://www.sohamkamani.com/golang/json/#decoding-json-to-maps---unstructured-data
